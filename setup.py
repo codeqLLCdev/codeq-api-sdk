@@ -23,7 +23,7 @@ setup(
         # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Natural Language Processing',
+        'Internet :: WWW/HTTP',
         'License :: OSI Approved :: Apache license 2.0',
         'Programming Language :: Python :: 3',
     ],
