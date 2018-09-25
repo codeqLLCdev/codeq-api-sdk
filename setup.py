@@ -3,6 +3,8 @@ import codeq_nlp_api
 
 version = codeq_nlp_api.__version__
 
+download_url = "https://github.com/codeqLLCdev/codeq-api-sdk/archive/v%s.tar.gz" % version
+
 setup(
     name='codeq-nlp-api',
     packages=['codeq_nlp_api'],
@@ -12,7 +14,7 @@ setup(
     author='Codeq, LLC',
     author_email='rodrigo@codeq.com',
     url='http://api.codeq.com:8880/',
-    download_url='https://github.com/codeqLLCdev/codeq-api-sdk/archive/%s.tar.gz' % version,
+    download_url=download_url,
     keywords=['codeq', 'nlp', 'api', 'natural language processing'],
     install_requires=[
         'requests',
