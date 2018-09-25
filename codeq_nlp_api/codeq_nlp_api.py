@@ -185,7 +185,8 @@ class Sentence(OrderedClass):
 
 def document_from_dict(document_json_dict):
     document = Document(raw_text=document_json_dict['raw_text'])
-    document.run_time_stats = document_json_dict['run_time_stats']
+    if 'run_time_stats' in document_json_dict:
+        document.run_time_stats = document_json_dict['run_time_stats']
     sentences = []
     for sentence_dict in document_json_dict['sentences']:
         sentence = Sentence(raw_sentence=sentence_dict['raw_sentence'])
