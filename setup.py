@@ -5,14 +5,14 @@ version = codeq_nlp_api.__version__
 
 setup(
     name='codeq-nlp-api',
-    packages=['codeq-nlp-api'],
+    packages=['codeq_nlp_api'],
     version=version,
     license='Apache license 2.0',
     description='Codeq NLP API SDK for Python',
     author='Codeq, LLC',
     author_email='rodrigo@codeq.com',
     url='http://api.codeq.com:8880/',
-    download_url='https://github.com/codeqLLCdev/codeq-api-sdk/archive/v0.1.2.tar.gz',
+    download_url='https://github.com/codeqLLCdev/codeq-api-sdk/archive/%s.tar.gz' % version,
     keywords=['codeq', 'nlp', 'api', 'natural language processing'],
     install_requires=[
         'requests',
