@@ -187,6 +187,9 @@ def document_from_dict(document_json_dict):
     document = Document(raw_text=document_json_dict['raw_text'])
     if 'run_time_stats' in document_json_dict:
         document.run_time_stats = document_json_dict['run_time_stats']
+    else:
+        del document.run_time_stats
+        del document.errors
     sentences = []
     for sentence_dict in document_json_dict['sentences']:
         sentence = Sentence(raw_sentence=sentence_dict['raw_sentence'])
@@ -273,7 +276,7 @@ class CodeqClient(object):
         pipeline = 'dates'
         return self.run_request(text, pipeline)
 
-    def analyze(self, text, pipeline=None):
+    def analyze(self, text, pipeline=None, benchmark=False):
         """Input pipeline as a list of strings or a comma-separated string.
         Example: ['speechact', 'tasks'] or 'speechact, tasks'.
         Analyzer options: tokenize, ssplit, stopword, stem, truecase,
@@ -281,14 +284,15 @@ class CodeqClient(object):
         questions, anaphora, tasks, dates"""
         if isinstance(pipeline, str):
             pipeline = re.split(r'\s*,\s*', pipeline)
-        return self.run_request(text, pipeline=pipeline)
+        return self.run_request(text, pipeline=pipeline, benchmark=benchmark)
 
-    def run_request(self, text, pipeline):
+    def run_request(self, text, pipeline, benchmark=False):
         params = {
             'user_id': self.user_id,
             'user_key': self.user_key,
             'text': text,
             'pipeline': pipeline,
+            'benchmark': benchmark
         }
         request = requests.post(url=self.endpoint, json=params)
 
