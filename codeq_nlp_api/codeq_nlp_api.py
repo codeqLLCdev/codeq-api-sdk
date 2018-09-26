@@ -78,7 +78,7 @@ class Document(OrderedClass):
         """
         Converts a Document object into a dict from its not None attributes.
         """
-        doc_dict = dict()
+        doc_dict = OrderedDict()
         for attr, value in self.items():
             if value is not None:
                 if attr == 'sentences':
@@ -86,6 +86,9 @@ class Document(OrderedClass):
                 else:
                     doc_dict[attr] = value
         return doc_dict
+
+    def pretty_print(self):
+        return json.dumps(self.to_dict(), indent=2)
 
     def __str__(self):
         return 'Document: %s' % self.to_dict().__str__()
@@ -183,25 +186,6 @@ class Sentence(OrderedClass):
         return 'Sentence: %s' % self.to_dict().__str__()
 
 
-def document_from_dict(document_json_dict):
-    document = Document(raw_text=document_json_dict['raw_text'])
-    if 'run_time_stats' in document_json_dict:
-        document.run_time_stats = document_json_dict['run_time_stats']
-    else:
-        del document.run_time_stats
-        del document.errors
-    sentences = []
-    for sentence_dict in document_json_dict['sentences']:
-        sentence = Sentence(raw_sentence=sentence_dict['raw_sentence'])
-        for key, value in sentence_dict.items():
-            if key == 'raw_sentence':
-                continue  # We already set this.
-            sentence.__setattr__(key, value)
-        sentences.append(sentence)
-    document.sentences = sentences
-    return document
-
-
 class CodeqAPIError(Exception):
     pass
 
@@ -213,68 +197,52 @@ class CodeqClient(object):
         self.endpoint = CODEQ_API_ENDPOINT_LAST
 
     def tokenize(self, text):
-        pipeline = 'tokenize'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='tokenize')
 
     def ssplit(self, text):
-        pipeline = 'ssplit'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='ssplit')
 
     def stopword(self, text):
-        pipeline = 'stopword'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='stopword')
 
     def stem(self, text):
-        pipeline = 'stem'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='stem')
 
     def truecase(self, text):
-        pipeline = 'truecase'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='truecase')
 
     def detruecase(self, text):
-        pipeline = 'detruecase'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='detruecase')
 
     def pos(self, text):
-        pipeline = 'pos'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='pos')
 
     def emotion(self, text):
-        pipeline = 'emotion'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='emotion')
 
     def sarcasm(self, text):
-        pipeline = 'sarcasm'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='sarcasm')
 
     def sentiment(self, text):
-        pipeline = 'sentiment'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='sentiment')
 
     def ner(self, text):
-        pipeline = 'ner'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='ner')
 
     def speechact(self, text):
-        pipeline = 'speechact'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='speechact')
 
     def questions(self, text):
-        pipeline = 'questions'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='questions')
 
     def anaphora(self, text):
-        pipeline = 'anaphora'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='anaphora')
 
     def tasks(self, text):
-        pipeline = 'tasks'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='tasks')
 
     def dates(self, text):
-        pipeline = 'dates'
-        return self.run_request(text, pipeline)
+        return self.__run_request(text, pipeline='dates')
 
     def analyze(self, text, pipeline=None, benchmark=False):
         """Input pipeline as a list of strings or a comma-separated string.
@@ -284,9 +252,9 @@ class CodeqClient(object):
         questions, anaphora, tasks, dates"""
         if isinstance(pipeline, str):
             pipeline = re.split(r'\s*,\s*', pipeline)
-        return self.run_request(text, pipeline=pipeline, benchmark=benchmark)
+        return self.__run_request(text, pipeline=pipeline, benchmark=benchmark)
 
-    def run_request(self, text, pipeline, benchmark=False):
+    def __run_request(self, text, pipeline, benchmark=False):
         params = {
             'user_id': self.user_id,
             'user_key': self.user_key,
@@ -299,7 +267,29 @@ class CodeqClient(object):
         if request.status_code == 200:
             # Make OrderedDict from request.text output
             document_json = json.loads(request.text, object_pairs_hook=OrderedDict)
-            document = document_from_dict(document_json)
-            return document
+            return self.__document_from_dict(document_json, benchmark)
         else:
             raise CodeqAPIError("%s; %s" % (request.status_code, request.reason))
+
+    @staticmethod
+    def __document_from_dict(document_json_dict, benchmark):
+        document = Document(raw_text=document_json_dict['raw_text'])
+        sentences = []
+        for sentence_dict in document_json_dict['sentences']:
+            sentence = Sentence(raw_sentence=sentence_dict['raw_sentence'])
+            for key, value in sentence_dict.items():
+                if key == 'raw_sentence':
+                    # We already set this
+                    continue
+                sentence.__setattr__(key, value)
+            sentences.append(sentence)
+        document.sentences = sentences
+
+        if benchmark:
+            document.run_time_stats = document_json_dict['run_time_stats']
+            document.errors = document_json_dict['errors']
+        else:
+            document.run_time_stats = None
+            document.errors = None
+
+        return document
