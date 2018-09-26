@@ -13,7 +13,7 @@ setup(
     description='Codeq NLP API SDK for Python',
     author='Codeq, LLC',
     author_email='rodrigo@codeq.com',
-    url='http://api.codeq.com:8880/',
+    url='https://api.codeq.com',
     download_url=download_url,
     keywords=['codeq', 'nlp', 'api', 'natural language processing'],
     install_requires=[
