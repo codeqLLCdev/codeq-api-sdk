@@ -3,7 +3,7 @@ import json
 import re
 import requests
 
-CODEQ_API_ENDPOINT_LAST = 'http://api.codeq.com:8870/v1'
+CODEQ_API_ENDPOINT_LAST = 'https://api.codeq.com:8870/v1'
 
 
 class OrderedClass:
