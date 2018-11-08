@@ -130,6 +130,8 @@ class Sentence(OrderedClass):
         self.stems = None
         self.lemmas = None
         self.pos_tags = None
+        
+        self.dependencies = None
 
         self.truecase_sentence = None
         self.detruecase_sentence = None
@@ -216,6 +218,9 @@ class CodeqClient(object):
 
     def pos(self, text):
         return self.__run_request(text, pipeline='pos')
+
+    def parse(self, text):
+        return self.__run_request(text, pipeline='parse')
 
     def emotion(self, text):
         return self.__run_request(text, pipeline='emotion')
