@@ -118,7 +118,7 @@ class Sentence(OrderedClass):
     - emotions: a list of emotions conveyed in a sentence
     - sentiment: sentiment conveyed in a sentence
     - task: an integer signaling if a sentence is a task or not
-    - resolved_anaphora: a list of tokens with resolved personal pronouns
+    - coreferences: a list of dicts containing resolved pronominal coreferences
     """
 
     def __init__(self, raw_sentence):
@@ -130,7 +130,7 @@ class Sentence(OrderedClass):
         self.stems = None
         self.lemmas = None
         self.pos_tags = None
-        
+
         self.dependencies = None
 
         self.truecase_sentence = None
@@ -157,7 +157,7 @@ class Sentence(OrderedClass):
         self.task_subclassification = None
         self.task_actions = None
 
-        self.resolved_anaphora = None
+        self.coreferences = None
 
     @property
     def tagged_sentence(self):
@@ -240,21 +240,21 @@ class CodeqClient(object):
     def questions(self, text):
         return self.__run_request(text, pipeline='questions')
 
-    def anaphora(self, text):
-        return self.__run_request(text, pipeline='anaphora')
-
     def tasks(self, text):
         return self.__run_request(text, pipeline='tasks')
 
     def dates(self, text):
         return self.__run_request(text, pipeline='dates')
 
+    def coreferences(self, text):
+        return self.__run_request(text, pipeline='coreference')
+
     def analyze(self, text, pipeline=None, benchmark=False):
         """Input pipeline as a list of strings or a comma-separated string.
         Example: ['speechact', 'tasks'] or 'speechact, tasks'.
         Analyzer options: tokenize, ssplit, stopword, stem, truecase,
         detruecase, pos, emotion, sarcasm, sentiment, ner, speechact,
-        questions, anaphora, tasks, dates"""
+        questions, tasks, dates, coreference"""
         if isinstance(pipeline, str):
             pipeline = re.split(r'\s*,\s*', pipeline)
         return self.__run_request(text, pipeline=pipeline, benchmark=benchmark)
