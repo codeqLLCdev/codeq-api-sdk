@@ -10,6 +10,6 @@ In addition to these NLP tools, our API features many advanced Deep Learning cla
 Developers Guide
 =====
 
-See our here for additional documentation:
+See here for additional documentation:
 
 http://api.codeq.com:8880/api
