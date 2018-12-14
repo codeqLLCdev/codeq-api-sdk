@@ -12,4 +12,4 @@ Developers Guide
 
 See here for additional documentation:
 
-http://api.codeq.com:8880/api
+https://api.codeq.com/api
