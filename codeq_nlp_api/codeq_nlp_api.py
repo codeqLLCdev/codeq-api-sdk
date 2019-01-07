@@ -6,26 +6,26 @@ import requests
 CODEQ_API_ENDPOINT_LAST = 'https://api.codeq.com/v1'
 
 
-class OrderedClass:
+class OrderedClass(object):
     """
     Helper meta class to store variables in order of declaration within __init__ method.
     """
 
     def __new__(cls, *args, **kwargs):
         instance = object.__new__(cls)
-        instance.__odict__ = OrderedDict()
+        instance.__dict__ = OrderedDict()
         return instance
 
     def __setattr__(self, key, value):
-        if key != '__odict__':
-            self.__odict__[key] = value
+        if key != '__dict__':
+            self.__dict__[key] = value
         object.__setattr__(self, key, value)
 
     def keys(self):
-        return self.__odict__.keys()
+        return self.__dict__.keys()
 
     def items(self):
-        return self.__odict__.items()
+        return self.__dict__.items()
 
 
 class Document(OrderedClass):
