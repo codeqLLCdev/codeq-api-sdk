@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 
 download_url = "https://github.com/codeqLLCdev/codeq-api-sdk/archive/v%s.tar.gz" % __version__
 
@@ -24,6 +24,7 @@ setup(
         'Intended Audience :: Developers',
         'Topic :: Internet :: WWW/HTTP',
         'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
     ],
 )
