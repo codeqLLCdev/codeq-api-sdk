@@ -1,14 +1,13 @@
 from distutils.core import setup
-import codeq_nlp_api
 
-version = codeq_nlp_api.__version__
+__version__ = "0.8.0"
 
-download_url = "https://github.com/codeqLLCdev/codeq-api-sdk/archive/v%s.tar.gz" % version
+download_url = "https://github.com/codeqLLCdev/codeq-api-sdk/archive/v%s.tar.gz" % __version__
 
 setup(
     name='codeq-nlp-api',
     packages=['codeq_nlp_api'],
-    version=version,
+    version=__version__,
     license='Apache license 2.0',
     description='Codeq NLP API SDK for Python',
     author='Codeq, LLC',
