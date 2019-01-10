@@ -110,15 +110,22 @@ class Sentence(OrderedClass):
     - pos_tags: a list of Part of Speech tags, corresponding to each word in the list of tokens
     - truecase_sentence: a string with a Truecase sentence
     - detruecase_sentence: a string with a Detruecase sentence
-    - speech_act: a tag indicating its corresponding speech act
-    - speech_act_value: the numeric value of the speech act
+    - speech_acts: a list of tags indicating its corresponding speech act
+    - speech_act_values: a list of numeric values associated to a speech act
     - question_types: a list of the question types, if the sentence is categorized as speech act: 'question'
     - question_tags: a list of one- or two-letter question tags, if sentence is categorized as speech act: 'question'
     - named_entities: a list of named_entities tuples containing (entity tokens, type, list of tokens positions)
     - emotions: a list of emotions conveyed in a sentence
-    - sentiment: sentiment conveyed in a sentence
-    - task: an integer signaling if a sentence is a task or not
-    - coreferences: a list of dicts containing resolved pronominal coreferences
+    - sentiments: a list of sentiments conveyed in a sentence
+    - dates: a list of date named entities with the resolved date in ISO format
+    - is_task: a boolean to indicate if a sentence is a task or not
+    - task_subclassification: a list of tags indicating its predicted task sub type
+    - task_actions: a list of tuples indicating suggested task actions
+    - coreferences: a list of dicts containing resolved pronominal coreferences.
+        Each coreference is a dictionary that includes: mention, referent, first_referent,
+        where each of those elements is a tuple containing a coreference id, the tokens and the span of the item.
+        Additionally, each coreference dict contains a coreference chain (all the ids of the linked mentions)
+        and the first referent of a chain.
     """
 
     def __init__(self, raw_sentence):
@@ -136,8 +143,8 @@ class Sentence(OrderedClass):
         self.truecase_sentence = None
         self.detruecase_sentence = None
 
-        self.speech_act = None
-        self.speech_act_value = None
+        self.speech_acts = None
+        self.speech_act_values = None
         self.question_types = None
         self.question_tags = None
 
@@ -147,9 +154,9 @@ class Sentence(OrderedClass):
         self.nes_positions = None
 
         self.emotions = None
-        self.sarcastic = None
+        self.sarcasm = None
 
-        self.sentiment = None
+        self.sentiments = None
 
         self.dates = None
 
@@ -237,14 +244,14 @@ class CodeqClient(object):
     def speechact(self, text):
         return self.__run_request(text, pipeline='speechact')
 
-    def questions(self, text):
-        return self.__run_request(text, pipeline='questions')
+    def question(self, text):
+        return self.__run_request(text, pipeline='question')
 
-    def tasks(self, text):
-        return self.__run_request(text, pipeline='tasks')
+    def task(self, text):
+        return self.__run_request(text, pipeline='task')
 
-    def dates(self, text):
-        return self.__run_request(text, pipeline='dates')
+    def date(self, text):
+        return self.__run_request(text, pipeline='date')
 
     def coreferences(self, text):
         return self.__run_request(text, pipeline='coreference')
@@ -254,7 +261,7 @@ class CodeqClient(object):
         Example: ['speechact', 'tasks'] or 'speechact, tasks'.
         Analyzer options: tokenize, ssplit, stopword, stem, truecase,
         detruecase, pos, emotion, sarcasm, sentiment, ner, speechact,
-        questions, tasks, dates, coreference"""
+        question, task, date, coreference"""
         if isinstance(pipeline, str):
             pipeline = re.split(r'\s*,\s*', pipeline)
         return self.__run_request(text, pipeline=pipeline, benchmark=benchmark)
