@@ -49,6 +49,7 @@ class Document(OrderedClass):
         self.raw_text = raw_text
         self.tokens = tokens
         self.sentences = sentences
+        self.summary = ''
         # Errors
         self.errors = []
         # Stats
