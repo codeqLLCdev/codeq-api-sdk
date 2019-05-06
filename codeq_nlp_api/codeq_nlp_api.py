@@ -257,12 +257,15 @@ class CodeqClient(object):
     def coreferences(self, text):
         return self.__run_request(text, pipeline='coreference')
 
+    def summarize(self, text):
+        return self.__run_request(text, pipeline='summarize')
+
     def analyze(self, text, pipeline=None, benchmark=False):
         """Input pipeline as a list of strings or a comma-separated string.
         Example: ['speechact', 'tasks'] or 'speechact, tasks'.
         Analyzer options: tokenize, ssplit, stopword, stem, truecase,
         detruecase, pos, emotion, sarcasm, sentiment, ner, speechact,
-        question, task, date, coreference"""
+        parse, question, task, date, coreference, summarize"""
         if isinstance(pipeline, str):
             pipeline = re.split(r'\s*,\s*', pipeline)
         return self.__run_request(text, pipeline=pipeline, benchmark=benchmark)
