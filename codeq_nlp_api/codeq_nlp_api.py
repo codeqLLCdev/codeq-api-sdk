@@ -49,7 +49,7 @@ class Document(OrderedClass):
         self.raw_text = raw_text
         self.tokens = tokens
         self.sentences = sentences
-        self.summary = ''
+        self.summary = None
         # Errors
         self.errors = []
         # Stats
@@ -104,6 +104,7 @@ class Sentence(OrderedClass):
 
     - raw_sentence: the input string used to create the Sentence
     - position: a number indicating the index position of the sentence in the Document
+    - paragraph: a number indicating the index paragrah of the sentence in the Document
     - tokens: a list of words
     - tokens_filtered: a list of words without stop words
     - stems: a list of stemmed words
@@ -132,6 +133,7 @@ class Sentence(OrderedClass):
     def __init__(self, raw_sentence):
         self.raw_sentence = raw_sentence
         self.position = None
+        self.paragraph = None
         self.tokens = None
         self.tokens_filtered = None
 
