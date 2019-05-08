@@ -169,6 +169,8 @@ class Sentence(OrderedClass):
 
         self.coreferences = None
 
+        self.compressed_sentence = None
+
     @property
     def tagged_sentence(self):
         if not self.pos_tags:
