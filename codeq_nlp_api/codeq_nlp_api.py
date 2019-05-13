@@ -50,6 +50,7 @@ class Document(OrderedClass):
         self.tokens = tokens
         self.sentences = sentences
         self.summary = None
+        self.compressed_summary = None
         # Errors
         self.errors = []
         # Stats
