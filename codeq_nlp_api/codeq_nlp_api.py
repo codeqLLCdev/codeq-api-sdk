@@ -51,6 +51,8 @@ class Document(OrderedClass):
         self.sentences = sentences
         self.summary = None
         self.compressed_summary = None
+        self.summary_detokens = {}
+        self.compressed_detokens_summary = {}
         # Errors
         self.errors = []
         # Stats
