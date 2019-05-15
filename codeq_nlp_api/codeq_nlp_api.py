@@ -37,6 +37,10 @@ class Document(OrderedClass):
 
     - raw_text: the input string used to create the Document
     - tokens: a list of words
+    - summary: a string containing the summary of the input text
+    - compressed_summary: TODO
+    - summary_detokens: TODO
+    - compressed_summary_detokens: TODO
     - sentences: a list of Sentences objects
     - run_time_stats: a dict containing run time statistics about each annotator
 
@@ -50,9 +54,9 @@ class Document(OrderedClass):
         self.tokens = tokens
         self.sentences = sentences
         self.summary = None
-        self.compressed_summary = None
         self.summary_detokens = {}
-        self.compressed_detokens_summary = {}
+        self.compressed_summary = None
+        self.compressed_summary_detokens = {}
         # Errors
         self.errors = []
         # Stats
@@ -297,6 +301,10 @@ class CodeqClient(object):
     @staticmethod
     def __document_from_dict(document_json_dict, benchmark):
         document = Document(raw_text=document_json_dict['raw_text'])
+        document.summary = document_json_dict['summary']
+        document.summary_detokens = document_json_dict['summary_detokens']
+        document.compressed_summary = document_json_dict['compressed_summary']
+        document.compressed_summary_detokens = document_json_dict['compressed_summary_detokens']
         sentences = []
         for sentence_dict in document_json_dict['sentences']:
             sentence = Sentence(raw_sentence=sentence_dict['raw_sentence'])
