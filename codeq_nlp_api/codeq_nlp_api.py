@@ -301,6 +301,7 @@ class CodeqClient(object):
     @staticmethod
     def __document_from_dict(document_json_dict, benchmark):
         document = Document(raw_text=document_json_dict['raw_text'])
+        document.raw_detokens = document_json_dict['raw_detokens']
         document.summary = document_json_dict['summary']
         document.summary_detokens = document_json_dict['summary_detokens']
         document.compressed_summary = document_json_dict['compressed_summary']
