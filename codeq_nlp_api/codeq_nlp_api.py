@@ -38,14 +38,12 @@ class Document(OrderedClass):
     - raw_text: the input string used to create the Document
     - tokens: a list of words
     - summary: a string containing the summary of the input text
-    - compressed_summary: TODO
-    - summary_detokens: TODO
-    - compressed_summary_detokens: TODO
+    - summary_detokens: a string containing the summary of the input text in detokenized form
+    - compressed_summary: a string containing the compressed summary of the input text
+    - compressed_summary_detokens: a string containing the compressed summary of the input text in detokenized form
     - sentences: a list of Sentences objects
     - run_time_stats: a dict containing run time statistics about each annotator
 
-    (The tokens, tokens_filtered and stems attributes can be stored at Document level, without the need to split into
-    sentences)
     """
 
     def __init__(self, raw_text, tokens=None, sentences=None):
@@ -53,6 +51,7 @@ class Document(OrderedClass):
         self.raw_text = raw_text
         self.tokens = tokens
         self.sentences = sentences
+        self.raw_detokens = None
         self.summary = None
         self.summary_detokens = {}
         self.compressed_summary = None
@@ -88,7 +87,7 @@ class Document(OrderedClass):
         """
         doc_dict = OrderedDict()
         for attr, value in self.items():
-            if value is not None:
+            if value is not None and value != {} and value != []:
                 if attr == 'sentences':
                     doc_dict[attr] = [s.to_dict() for s in value]
                 else:
@@ -135,6 +134,7 @@ class Sentence(OrderedClass):
         where each of those elements is a tuple containing a coreference id, the tokens and the span of the item.
         Additionally, each coreference dict contains a coreference chain (all the ids of the linked mentions)
         and the first referent of a chain.
+    - compressed_sentence: a string with a a shortened version of a sentence.
     """
 
     def __init__(self, raw_sentence):
@@ -268,15 +268,29 @@ class CodeqClient(object):
     def coreferences(self, text):
         return self.__run_request(text, pipeline='coreference')
 
+    def compress(self, text):
+        return self.__run_request(text, pipeline='compress')
+
     def summarize(self, text):
         return self.__run_request(text, pipeline='summarize')
 
+    def summarize_compress(self, text):
+        return self.__run_request(text, pipeline='summarize_compress')
+
     def analyze(self, text, pipeline=None, benchmark=False):
-        """Input pipeline as a list of strings or a comma-separated string.
-        Example: ['speechact', 'tasks'] or 'speechact, tasks'.
-        Analyzer options: tokenize, ssplit, stopword, stem, truecase,
-        detruecase, pos, emotion, sarcasm, sentiment, ner, speechact,
-        parse, question, task, date, coreference, summarize"""
+        """
+        :param text: A string
+        :param pipeline: A list of strings or a comma-separated string
+            indicating the specific annotators to apply to the input text.
+            Example: ['speechact', 'tasks'] or 'speechact, tasks'.
+            Analyzer Annotator options:
+                tokenize, ssplit, stopword, stem, truecase,
+                detruecase, pos, emotion, sarcasm, sentiment, ner, speechact,
+                parse, question, task, date, coreference,
+                compress, summarize, summarize_compress
+        :param benchmark:
+        :return:
+        """
         if isinstance(pipeline, str):
             pipeline = re.split(r'\s*,\s*', pipeline)
         return self.__run_request(text, pipeline=pipeline, benchmark=benchmark)
