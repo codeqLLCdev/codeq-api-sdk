@@ -116,6 +116,9 @@ class Sentence(OrderedClass):
     - stems: a list of stemmed words
     - lemmas: a list of lemmatized words
     - pos_tags: a list of Part of Speech tags, corresponding to each word in the list of tokens
+    - dependencies: a list of tuples containing the dependencies of each word, including: head, dependent and relation.
+    - chunks: list of non-overlapping groups based on prominent parts of speech, e.g., noun or verbal phrases
+    - chunk_labels: list of chunk tags for each word
     - truecase_sentence: a string with a Truecase sentence
     - detruecase_sentence: a string with a Detruecase sentence
     - speech_acts: a list of tags indicating its corresponding speech act
@@ -149,6 +152,9 @@ class Sentence(OrderedClass):
         self.pos_tags = None
 
         self.dependencies = None
+
+        self.chunks = None
+        self.chunk_labels = None
 
         self.truecase_sentence = None
         self.detruecase_sentence = None
