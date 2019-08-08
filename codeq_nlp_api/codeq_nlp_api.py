@@ -36,6 +36,8 @@ class Document(OrderedClass):
     Document attributes:
 
     - raw_text: the input string used to create the Document
+    - language: predicted language
+    - language_probability: probability of predicted language
     - tokens: a list of words
     - summary: a string containing the summary of the input text
     - summary_detokens: a string containing the summary of the input text in detokenized form
@@ -51,6 +53,8 @@ class Document(OrderedClass):
         self.language = None
         self.language_probability = None
         self.raw_text = raw_text
+        self.language = None
+        self.language_probability = None
         self.tokens = tokens
         self.sentences = sentences
         self.raw_detokens = None
