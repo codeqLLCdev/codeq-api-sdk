@@ -48,6 +48,8 @@ class Document(OrderedClass):
 
     def __init__(self, raw_text, tokens=None, sentences=None):
         # Document content
+        self.language = None
+        self.language_probability = None
         self.raw_text = raw_text
         self.tokens = tokens
         self.sentences = sentences
