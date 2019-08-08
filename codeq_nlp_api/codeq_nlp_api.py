@@ -53,8 +53,6 @@ class Document(OrderedClass):
         self.language = None
         self.language_probability = None
         self.raw_text = raw_text
-        self.language = None
-        self.language_probability = None
         self.tokens = tokens
         self.sentences = sentences
         self.raw_detokens = None
