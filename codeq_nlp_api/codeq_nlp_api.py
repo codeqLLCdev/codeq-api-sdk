@@ -169,6 +169,7 @@ class Sentence(OrderedClass):
         self.question_tags = None
 
         self.named_entities = None
+        self.named_entities_linked = None
         self.nes_terms = None
         self.nes_types = None
         self.nes_positions = None
@@ -325,6 +326,7 @@ class CodeqClient(object):
     @staticmethod
     def __document_from_dict(document_json_dict, benchmark):
         document = Document(raw_text=document_json_dict['raw_text'])
+        document.tokens = document_json_dict['tokens']
         document.language = document_json_dict['language']
         document.language_probability = document_json_dict['language_probability']
         document.raw_detokens = document_json_dict['raw_detokens']
