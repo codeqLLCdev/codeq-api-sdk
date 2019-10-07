@@ -334,6 +334,7 @@ class CodeqClient(object):
         document.summary_detokens = document_json_dict['summary_detokens']
         document.compressed_summary = document_json_dict['compressed_summary']
         document.compressed_summary_detokens = document_json_dict['compressed_summary_detokens']
+
         sentences = []
         for sentence_dict in document_json_dict['sentences']:
             sentence = Sentence(raw_sentence=sentence_dict['raw_sentence'])
@@ -347,9 +348,10 @@ class CodeqClient(object):
 
         if benchmark:
             document.run_time_stats = document_json_dict['run_time_stats']
-            document.errors = document_json_dict['errors']
         else:
             document.run_time_stats = None
-            document.errors = None
+
+        if 'errors'in document_json_dict and document_json_dict['errors']:
+            document.errors = document_json_dict['errors']
 
         return document
