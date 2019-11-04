@@ -130,6 +130,8 @@ class Sentence(OrderedClass):
     - question_types: a list of the question types, if the sentence is categorized as speech act: 'question'
     - question_tags: a list of one- or two-letter question tags, if sentence is categorized as speech act: 'question'
     - named_entities: a list of named_entities tuples containing (entity tokens, type, list of tokens positions)
+    - named_entities_linked: a list of dictionaries containing disambiguated entities with a reference
+        to Wikipedia and Wikidata URLs.
     - emotions: a list of emotions conveyed in a sentence
     - sentiments: a list of sentiments conveyed in a sentence
     - dates: a list of date named entities with the resolved date in ISO format
@@ -228,8 +230,14 @@ class CodeqClient(object):
         self.user_key = user_key
         self.endpoint = CODEQ_API_ENDPOINT_LAST
 
+    def language(self, text):
+        return self.__run_request(text, pipeline='language')
+
     def tokenize(self, text):
         return self.__run_request(text, pipeline='tokenize')
+
+    def detokenize(self, text):
+        return self.__run_request(text, pipeline='detokenize')
 
     def ssplit(self, text):
         return self.__run_request(text, pipeline='ssplit')
@@ -249,20 +257,8 @@ class CodeqClient(object):
     def pos(self, text):
         return self.__run_request(text, pipeline='pos')
 
-    def parse(self, text):
-        return self.__run_request(text, pipeline='parse')
-
-    def emotion(self, text):
-        return self.__run_request(text, pipeline='emotion')
-
-    def sarcasm(self, text):
-        return self.__run_request(text, pipeline='sarcasm')
-
-    def sentiment(self, text):
-        return self.__run_request(text, pipeline='sentiment')
-
-    def ner(self, text):
-        return self.__run_request(text, pipeline='ner')
+    def lemma(self, text):
+        return self.__run_request(text, pipeline='lemma')
 
     def speechact(self, text):
         return self.__run_request(text, pipeline='speechact')
@@ -270,14 +266,29 @@ class CodeqClient(object):
     def question(self, text):
         return self.__run_request(text, pipeline='question')
 
-    def task(self, text):
-        return self.__run_request(text, pipeline='task')
+    def ner(self, text):
+        return self.__run_request(text, pipeline='ner')
+
+    def parse(self, text):
+        return self.__run_request(text, pipeline='parse')
+
+    def coreferences(self, text):
+        return self.__run_request(text, pipeline='coreference')
 
     def date(self, text):
         return self.__run_request(text, pipeline='date')
 
-    def coreferences(self, text):
-        return self.__run_request(text, pipeline='coreference')
+    def task(self, text):
+        return self.__run_request(text, pipeline='task')
+
+    def sentiment(self, text):
+        return self.__run_request(text, pipeline='sentiment')
+
+    def emotion(self, text):
+        return self.__run_request(text, pipeline='emotion')
+
+    def sarcasm(self, text):
+        return self.__run_request(text, pipeline='sarcasm')
 
     def compress(self, text):
         return self.__run_request(text, pipeline='compress')
@@ -288,6 +299,12 @@ class CodeqClient(object):
     def summarize_compress(self, text):
         return self.__run_request(text, pipeline='summarize_compress')
 
+    def chunk(self, text):
+        return self.__run_request(text, pipeline='chunk')
+
+    def nel(self, text):
+        return self.__run_request(text, pipeline='nel')
+
     def analyze(self, text, pipeline=None, benchmark=False):
         """
         :param text: A string
@@ -295,11 +312,11 @@ class CodeqClient(object):
             indicating the specific annotators to apply to the input text.
             Example: ['speechact', 'tasks'] or 'speechact, tasks'.
             Analyzer Annotator options:
-                tokenize, ssplit, stopword, stem, truecase,
-                detruecase, pos, emotion, sarcasm, sentiment, ner, speechact,
-                parse, question, task, date, coreference,
-                compress, summarize, summarize_compress
-        :param benchmark:
+                language, tokenize, detokenize, ssplit, stopword, stem, truecase, detruecase,
+                pos, lemma, speechact, question, ner, parse, coreference, date, task,
+                sentiment, emotion, sarcasm, compress, summarize, summarize_compress,
+                chunk, nel
+        :param benchmark: Boolean to indicate the storage of benchmark run times for each Annotator
         :return:
         """
         if isinstance(pipeline, str):
@@ -351,7 +368,7 @@ class CodeqClient(object):
         else:
             document.run_time_stats = None
 
-        if 'errors'in document_json_dict and document_json_dict['errors']:
+        if 'errors' in document_json_dict and document_json_dict['errors']:
             document.errors = document_json_dict['errors']
 
         return document
