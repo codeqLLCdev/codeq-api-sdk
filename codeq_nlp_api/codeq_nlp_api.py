@@ -129,9 +129,10 @@ class Sentence(OrderedClass):
     - speech_act_values: a list of numeric values associated to a speech act
     - question_types: a list of the question types, if the sentence is categorized as speech act: 'question'
     - question_tags: a list of one- or two-letter question tags, if sentence is categorized as speech act: 'question'
-    - named_entities: a list of named_entities tuples containing (entity tokens, type, list of tokens positions)
+    - named_entities: a list of tuples containing (entity tokens, type, list of tokens positions)
     - named_entities_linked: a list of dictionaries containing disambiguated entities with a reference
         to Wikipedia and Wikidata URLs.
+    - named_entities_salience: a list of tuples indicating if a named entity is salient or not, and its salience score.
     - emotions: a list of emotions conveyed in a sentence
     - sentiments: a list of sentiments conveyed in a sentence
     - dates: a list of date named entities with the resolved date in ISO format
@@ -172,6 +173,7 @@ class Sentence(OrderedClass):
 
         self.named_entities = None
         self.named_entities_linked = None
+        self.named_entities_salience = None
         self.nes_terms = None
         self.nes_types = None
         self.nes_positions = None
