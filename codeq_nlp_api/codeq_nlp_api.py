@@ -307,6 +307,9 @@ class CodeqClient(object):
     def nel(self, text):
         return self.__run_request(text, pipeline='nel')
 
+    def salience(self, text):
+        return self.__run_request(text, pipeline='salience')
+
     def analyze(self, text, pipeline=None, benchmark=False):
         """
         :param text: A string
