@@ -6,26 +6,26 @@ import requests
 CODEQ_API_ENDPOINT_LAST = 'https://api.codeq.com/v1'
 
 
-class OrderedClass:
+class OrderedClass(object):
     """
     Helper meta class to store variables in order of declaration within __init__ method.
     """
 
     def __new__(cls, *args, **kwargs):
         instance = object.__new__(cls)
-        instance.__odict__ = OrderedDict()
+        instance.__dict__ = OrderedDict()
         return instance
 
     def __setattr__(self, key, value):
-        if key != '__odict__':
-            self.__odict__[key] = value
+        if key != '__dict__':
+            self.__dict__[key] = value
         object.__setattr__(self, key, value)
 
     def keys(self):
-        return self.__odict__.keys()
+        return self.__dict__.keys()
 
     def items(self):
-        return self.__odict__.items()
+        return self.__dict__.items()
 
 
 class Document(OrderedClass):
@@ -36,19 +36,30 @@ class Document(OrderedClass):
     Document attributes:
 
     - raw_text: the input string used to create the Document
+    - language: predicted language
+    - language_probability: probability of predicted language
     - tokens: a list of words
+    - summary: a string containing the summary of the input text
+    - summary_detokens: a string containing the summary of the input text in detokenized form
+    - compressed_summary: a string containing the compressed summary of the input text
+    - compressed_summary_detokens: a string containing the compressed summary of the input text in detokenized form
     - sentences: a list of Sentences objects
     - run_time_stats: a dict containing run time statistics about each annotator
 
-    (The tokens, tokens_filtered and stems attributes can be stored at Document level, without the need to split into
-    sentences)
     """
 
     def __init__(self, raw_text, tokens=None, sentences=None):
         # Document content
+        self.language = None
+        self.language_probability = None
         self.raw_text = raw_text
         self.tokens = tokens
         self.sentences = sentences
+        self.raw_detokens = None
+        self.summary = None
+        self.summary_detokens = {}
+        self.compressed_summary = None
+        self.compressed_summary_detokens = {}
         # Errors
         self.errors = []
         # Stats
@@ -80,7 +91,7 @@ class Document(OrderedClass):
         """
         doc_dict = OrderedDict()
         for attr, value in self.items():
-            if value is not None:
+            if value is not None and value != {} and value != []:
                 if attr == 'sentences':
                     doc_dict[attr] = [s.to_dict() for s in value]
                 else:
@@ -103,41 +114,57 @@ class Sentence(OrderedClass):
 
     - raw_sentence: the input string used to create the Sentence
     - position: a number indicating the index position of the sentence in the Document
+    - paragraph: a number indicating the index paragrah of the sentence in the Document
     - tokens: a list of words
     - tokens_filtered: a list of words without stop words
     - stems: a list of stemmed words
     - lemmas: a list of lemmatized words
     - pos_tags: a list of Part of Speech tags, corresponding to each word in the list of tokens
+    - dependencies: a list of tuples containing the dependencies of each word, including: head, dependent and relation.
+    - chunks: list of non-overlapping groups based on prominent parts of speech, e.g., noun or verbal phrases
+    - chunk_labels: list of chunk tags for each word
     - truecase_sentence: a string with a Truecase sentence
     - detruecase_sentence: a string with a Detruecase sentence
-    - speech_act: a tag indicating its corresponding speech act
-    - speech_act_value: the numeric value of the speech act
+    - speech_acts: a list of tags indicating its corresponding speech act
+    - speech_act_values: a list of numeric values associated to a speech act
     - question_types: a list of the question types, if the sentence is categorized as speech act: 'question'
     - question_tags: a list of one- or two-letter question tags, if sentence is categorized as speech act: 'question'
     - named_entities: a list of named_entities tuples containing (entity tokens, type, list of tokens positions)
     - emotions: a list of emotions conveyed in a sentence
-    - sentiment: sentiment conveyed in a sentence
-    - task: an integer signaling if a sentence is a task or not
-    - resolved_anaphora: a list of tokens with resolved personal pronouns
+    - sentiments: a list of sentiments conveyed in a sentence
+    - dates: a list of date named entities with the resolved date in ISO format
+    - is_task: a boolean to indicate if a sentence is a task or not
+    - task_subclassification: a list of tags indicating its predicted task sub type
+    - task_actions: a list of tuples indicating suggested task actions
+    - coreferences: a list of dicts containing resolved pronominal coreferences.
+        Each coreference is a dictionary that includes: mention, referent, first_referent,
+        where each of those elements is a tuple containing a coreference id, the tokens and the span of the item.
+        Additionally, each coreference dict contains a coreference chain (all the ids of the linked mentions)
+        and the first referent of a chain.
+    - compressed_sentence: a string with a a shortened version of a sentence.
     """
 
     def __init__(self, raw_sentence):
         self.raw_sentence = raw_sentence
         self.position = None
+        self.paragraph = None
         self.tokens = None
         self.tokens_filtered = None
 
         self.stems = None
         self.lemmas = None
         self.pos_tags = None
-        
+
         self.dependencies = None
+
+        self.chunks = None
+        self.chunk_labels = None
 
         self.truecase_sentence = None
         self.detruecase_sentence = None
 
-        self.speech_act = None
-        self.speech_act_value = None
+        self.speech_acts = None
+        self.speech_act_values = None
         self.question_types = None
         self.question_tags = None
 
@@ -147,9 +174,9 @@ class Sentence(OrderedClass):
         self.nes_positions = None
 
         self.emotions = None
-        self.sarcastic = None
+        self.sarcasm = None
 
-        self.sentiment = None
+        self.sentiments = None
 
         self.dates = None
 
@@ -157,7 +184,9 @@ class Sentence(OrderedClass):
         self.task_subclassification = None
         self.task_actions = None
 
-        self.resolved_anaphora = None
+        self.coreferences = None
+
+        self.compressed_sentence = None
 
     @property
     def tagged_sentence(self):
@@ -237,24 +266,41 @@ class CodeqClient(object):
     def speechact(self, text):
         return self.__run_request(text, pipeline='speechact')
 
-    def questions(self, text):
-        return self.__run_request(text, pipeline='questions')
+    def question(self, text):
+        return self.__run_request(text, pipeline='question')
 
-    def anaphora(self, text):
-        return self.__run_request(text, pipeline='anaphora')
+    def task(self, text):
+        return self.__run_request(text, pipeline='task')
 
-    def tasks(self, text):
-        return self.__run_request(text, pipeline='tasks')
+    def date(self, text):
+        return self.__run_request(text, pipeline='date')
 
-    def dates(self, text):
-        return self.__run_request(text, pipeline='dates')
+    def coreferences(self, text):
+        return self.__run_request(text, pipeline='coreference')
+
+    def compress(self, text):
+        return self.__run_request(text, pipeline='compress')
+
+    def summarize(self, text):
+        return self.__run_request(text, pipeline='summarize')
+
+    def summarize_compress(self, text):
+        return self.__run_request(text, pipeline='summarize_compress')
 
     def analyze(self, text, pipeline=None, benchmark=False):
-        """Input pipeline as a list of strings or a comma-separated string.
-        Example: ['speechact', 'tasks'] or 'speechact, tasks'.
-        Analyzer options: tokenize, ssplit, stopword, stem, truecase,
-        detruecase, pos, emotion, sarcasm, sentiment, ner, speechact,
-        questions, anaphora, tasks, dates"""
+        """
+        :param text: A string
+        :param pipeline: A list of strings or a comma-separated string
+            indicating the specific annotators to apply to the input text.
+            Example: ['speechact', 'tasks'] or 'speechact, tasks'.
+            Analyzer Annotator options:
+                tokenize, ssplit, stopword, stem, truecase,
+                detruecase, pos, emotion, sarcasm, sentiment, ner, speechact,
+                parse, question, task, date, coreference,
+                compress, summarize, summarize_compress
+        :param benchmark:
+        :return:
+        """
         if isinstance(pipeline, str):
             pipeline = re.split(r'\s*,\s*', pipeline)
         return self.__run_request(text, pipeline=pipeline, benchmark=benchmark)
@@ -279,6 +325,13 @@ class CodeqClient(object):
     @staticmethod
     def __document_from_dict(document_json_dict, benchmark):
         document = Document(raw_text=document_json_dict['raw_text'])
+        document.language = document_json_dict['language']
+        document.language_probability = document_json_dict['language_probability']
+        document.raw_detokens = document_json_dict['raw_detokens']
+        document.summary = document_json_dict['summary']
+        document.summary_detokens = document_json_dict['summary_detokens']
+        document.compressed_summary = document_json_dict['compressed_summary']
+        document.compressed_summary_detokens = document_json_dict['compressed_summary_detokens']
         sentences = []
         for sentence_dict in document_json_dict['sentences']:
             sentence = Sentence(raw_sentence=sentence_dict['raw_sentence'])

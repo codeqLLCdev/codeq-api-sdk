@@ -7,9 +7,16 @@ It contains all the necessary text processing tools one might expect from an NLP
    
 In addition to these NLP tools, our API features many advanced Deep Learning classification models to extract a rich representation from unstructured texts, including speech acts, questions, emotions, sarcasm, sentiment, date resolution, and tasks.
 
+
+Requirements
+=====
+
+This library requires Python 3.
+
+
 Developers Guide
 =====
 
-See our here for additional documentation:
+See here for additional documentation:
 
-http://api.codeq.com:8880/api
+https://api.codeq.com/api
