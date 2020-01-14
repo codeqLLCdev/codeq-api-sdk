@@ -129,7 +129,10 @@ class Sentence(OrderedClass):
     - speech_act_values: a list of numeric values associated to a speech act
     - question_types: a list of the question types, if the sentence is categorized as speech act: 'question'
     - question_tags: a list of one- or two-letter question tags, if sentence is categorized as speech act: 'question'
-    - named_entities: a list of named_entities tuples containing (entity tokens, type, list of tokens positions)
+    - named_entities: a list of tuples containing (entity tokens, type, list of tokens positions)
+    - named_entities_linked: a list of dictionaries containing disambiguated entities with a reference
+        to Wikipedia and Wikidata URLs.
+    - named_entities_salience: a list of tuples indicating if a named entity is salient or not, and its salience score.
     - emotions: a list of emotions conveyed in a sentence
     - sentiments: a list of sentiments conveyed in a sentence
     - dates: a list of date named entities with the resolved date in ISO format
@@ -169,6 +172,8 @@ class Sentence(OrderedClass):
         self.question_tags = None
 
         self.named_entities = None
+        self.named_entities_linked = None
+        self.named_entities_salience = None
         self.nes_terms = None
         self.nes_types = None
         self.nes_positions = None
@@ -227,8 +232,14 @@ class CodeqClient(object):
         self.user_key = user_key
         self.endpoint = CODEQ_API_ENDPOINT_LAST
 
+    def language(self, text):
+        return self.__run_request(text, pipeline='language')
+
     def tokenize(self, text):
         return self.__run_request(text, pipeline='tokenize')
+
+    def detokenize(self, text):
+        return self.__run_request(text, pipeline='detokenize')
 
     def ssplit(self, text):
         return self.__run_request(text, pipeline='ssplit')
@@ -248,20 +259,8 @@ class CodeqClient(object):
     def pos(self, text):
         return self.__run_request(text, pipeline='pos')
 
-    def parse(self, text):
-        return self.__run_request(text, pipeline='parse')
-
-    def emotion(self, text):
-        return self.__run_request(text, pipeline='emotion')
-
-    def sarcasm(self, text):
-        return self.__run_request(text, pipeline='sarcasm')
-
-    def sentiment(self, text):
-        return self.__run_request(text, pipeline='sentiment')
-
-    def ner(self, text):
-        return self.__run_request(text, pipeline='ner')
+    def lemma(self, text):
+        return self.__run_request(text, pipeline='lemma')
 
     def speechact(self, text):
         return self.__run_request(text, pipeline='speechact')
@@ -269,14 +268,29 @@ class CodeqClient(object):
     def question(self, text):
         return self.__run_request(text, pipeline='question')
 
-    def task(self, text):
-        return self.__run_request(text, pipeline='task')
+    def ner(self, text):
+        return self.__run_request(text, pipeline='ner')
+
+    def parse(self, text):
+        return self.__run_request(text, pipeline='parse')
+
+    def coreferences(self, text):
+        return self.__run_request(text, pipeline='coreference')
 
     def date(self, text):
         return self.__run_request(text, pipeline='date')
 
-    def coreferences(self, text):
-        return self.__run_request(text, pipeline='coreference')
+    def task(self, text):
+        return self.__run_request(text, pipeline='task')
+
+    def sentiment(self, text):
+        return self.__run_request(text, pipeline='sentiment')
+
+    def emotion(self, text):
+        return self.__run_request(text, pipeline='emotion')
+
+    def sarcasm(self, text):
+        return self.__run_request(text, pipeline='sarcasm')
 
     def compress(self, text):
         return self.__run_request(text, pipeline='compress')
@@ -287,6 +301,15 @@ class CodeqClient(object):
     def summarize_compress(self, text):
         return self.__run_request(text, pipeline='summarize_compress')
 
+    def chunk(self, text):
+        return self.__run_request(text, pipeline='chunk')
+
+    def nel(self, text):
+        return self.__run_request(text, pipeline='nel')
+
+    def salience(self, text):
+        return self.__run_request(text, pipeline='salience')
+
     def analyze(self, text, pipeline=None, benchmark=False):
         """
         :param text: A string
@@ -294,11 +317,11 @@ class CodeqClient(object):
             indicating the specific annotators to apply to the input text.
             Example: ['speechact', 'tasks'] or 'speechact, tasks'.
             Analyzer Annotator options:
-                tokenize, ssplit, stopword, stem, truecase,
-                detruecase, pos, emotion, sarcasm, sentiment, ner, speechact,
-                parse, question, task, date, coreference,
-                compress, summarize, summarize_compress
-        :param benchmark:
+                language, tokenize, detokenize, ssplit, stopword, stem, truecase, detruecase,
+                pos, lemma, speechact, question, ner, parse, coreference, date, task,
+                sentiment, emotion, sarcasm, compress, summarize, summarize_compress,
+                chunk, nel
+        :param benchmark: Boolean to indicate the storage of benchmark run times for each Annotator
         :return:
         """
         if isinstance(pipeline, str):
@@ -325,6 +348,7 @@ class CodeqClient(object):
     @staticmethod
     def __document_from_dict(document_json_dict, benchmark):
         document = Document(raw_text=document_json_dict['raw_text'])
+        document.tokens = document_json_dict['tokens']
         document.language = document_json_dict['language']
         document.language_probability = document_json_dict['language_probability']
         document.raw_detokens = document_json_dict['raw_detokens']
@@ -332,6 +356,7 @@ class CodeqClient(object):
         document.summary_detokens = document_json_dict['summary_detokens']
         document.compressed_summary = document_json_dict['compressed_summary']
         document.compressed_summary_detokens = document_json_dict['compressed_summary_detokens']
+
         sentences = []
         for sentence_dict in document_json_dict['sentences']:
             sentence = Sentence(raw_sentence=sentence_dict['raw_sentence'])
@@ -345,9 +370,10 @@ class CodeqClient(object):
 
         if benchmark:
             document.run_time_stats = document_json_dict['run_time_stats']
-            document.errors = document_json_dict['errors']
         else:
             document.run_time_stats = None
-            document.errors = None
+
+        if 'errors' in document_json_dict and document_json_dict['errors']:
+            document.errors = document_json_dict['errors']
 
         return document
