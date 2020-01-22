@@ -277,8 +277,8 @@ class CodeqClient(object):
     def parse(self, text):
         return self.__run_request(text, pipeline='parse')
 
-    def semantic_role_labeling(self, text):
-        return self.__run_request(text, pipeline='semantic_role_labeling')
+    def semantic_roles(self, text):
+        return self.__run_request(text, pipeline='semantic_roles')
 
     def coreferences(self, text):
         return self.__run_request(text, pipeline='coreference')
@@ -326,7 +326,7 @@ class CodeqClient(object):
                 language, tokenize, detokenize, ssplit, stopword, stem, truecase, detruecase,
                 pos, lemma, speechact, question, ner, parse, coreference, date, task,
                 sentiment, emotion, sarcasm, compress, summarize, summarize_compress,
-                chunk, nel, semantic_role_labeling
+                chunk, nel, semantic_roles
         :param benchmark: Boolean to indicate the storage of benchmark run times for each Annotator
         :return:
         """
