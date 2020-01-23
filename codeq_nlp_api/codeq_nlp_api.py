@@ -121,6 +121,9 @@ class Sentence(OrderedClass):
     - lemmas: a list of lemmatized words
     - pos_tags: a list of Part of Speech tags, corresponding to each word in the list of tokens
     - dependencies: a list of tuples containing the dependencies of each word, including: head, dependent and relation.
+    - semantic_roles: a dictionary giving information on the retrieved predicates for the sentence, their lemmas,
+        the constituents of the sentence found to be arguments of each predicate,
+        and the argument type classified for the each argument.
     - chunks: list of non-overlapping groups based on prominent parts of speech, e.g., noun or verbal phrases
     - chunk_labels: list of chunk tags for each word
     - truecase_sentence: a string with a Truecase sentence
@@ -159,6 +162,8 @@ class Sentence(OrderedClass):
         self.pos_tags = None
 
         self.dependencies = None
+
+        self.semantic_roles = None
 
         self.chunks = None
         self.chunk_labels = None
@@ -274,6 +279,9 @@ class CodeqClient(object):
     def parse(self, text):
         return self.__run_request(text, pipeline='parse')
 
+    def semantic_roles(self, text):
+        return self.__run_request(text, pipeline='semantic_roles')
+
     def coreferences(self, text):
         return self.__run_request(text, pipeline='coreference')
 
@@ -320,7 +328,7 @@ class CodeqClient(object):
                 language, tokenize, detokenize, ssplit, stopword, stem, truecase, detruecase,
                 pos, lemma, speechact, question, ner, parse, coreference, date, task,
                 sentiment, emotion, sarcasm, compress, summarize, summarize_compress,
-                chunk, nel
+                chunk, nel, semantic_roles
         :param benchmark: Boolean to indicate the storage of benchmark run times for each Annotator
         :return:
         """
