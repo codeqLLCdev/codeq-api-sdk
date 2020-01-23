@@ -121,7 +121,9 @@ class Sentence(OrderedClass):
     - lemmas: a list of lemmatized words
     - pos_tags: a list of Part of Speech tags, corresponding to each word in the list of tokens
     - dependencies: a list of tuples containing the dependencies of each word, including: head, dependent and relation.
-    - semantic_roles: a dictionary giving information on the retrieved predicates for the sentence, their lemmas, and the constituents of the sentence found to be arguments of each predicate, and the argument type classified for the each argument.
+    - semantic_roles: a dictionary giving information on the retrieved predicates for the sentence, their lemmas,
+        the constituents of the sentence found to be arguments of each predicate,
+        and the argument type classified for the each argument.
     - chunks: list of non-overlapping groups based on prominent parts of speech, e.g., noun or verbal phrases
     - chunk_labels: list of chunk tags for each word
     - truecase_sentence: a string with a Truecase sentence
@@ -160,7 +162,7 @@ class Sentence(OrderedClass):
         self.pos_tags = None
 
         self.dependencies = None
-        
+
         self.semantic_roles = None
 
         self.chunks = None
