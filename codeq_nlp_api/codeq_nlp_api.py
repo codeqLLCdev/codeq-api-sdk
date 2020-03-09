@@ -126,6 +126,7 @@ class Sentence(OrderedClass):
         and the argument type classified for the each argument.
     - chunks: list of non-overlapping groups based on prominent parts of speech, e.g., noun or verbal phrases
     - chunk_labels: list of chunk tags for each word
+    - chunk_tuples: list of tuples containing the chunk tag, chunk tokens and chunk tokens positions
     - truecase_sentence: a string with a Truecase sentence
     - detruecase_sentence: a string with a Detruecase sentence
     - speech_acts: a list of tags indicating its corresponding speech act
@@ -167,6 +168,7 @@ class Sentence(OrderedClass):
 
         self.chunks = None
         self.chunk_labels = None
+        self.chunk_tuples = None
 
         self.truecase_sentence = None
         self.detruecase_sentence = None
