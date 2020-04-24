@@ -43,6 +43,7 @@ class Document(OrderedClass):
     - summary_detokens: a string containing the summary of the input text in detokenized form
     - compressed_summary: a string containing the compressed summary of the input text
     - compressed_summary_detokens: a string containing the compressed summary of the input text in detokenized form
+    - keyphrases: a list of extracted keyphrases for the document, in decreasing order of relevance
     - sentences: a list of Sentences objects
     - run_time_stats: a dict containing run time statistics about each annotator
 
@@ -60,6 +61,7 @@ class Document(OrderedClass):
         self.summary_detokens = {}
         self.compressed_summary = None
         self.compressed_summary_detokens = {}
+        self.keyphrases = None
         # Errors
         self.errors = []
         # Stats
@@ -97,6 +99,19 @@ class Document(OrderedClass):
                 else:
                     doc_dict[attr] = value
         return doc_dict
+    
+    def get_keyphrases_by_num(self, num):
+        if self.keyphrases is None:
+            return None
+        else:
+            return self.keyphrases[:num]
+    
+    def get_keyphrases_by_fraction(self, frac):
+        if self.keyphrases is None:
+            return None
+        else:
+            num = int(frac * len(self.keyphrases))
+            return self.keyphrases[:num]
 
     def pretty_print(self):
         return json.dumps(self.to_dict(), indent=2)
