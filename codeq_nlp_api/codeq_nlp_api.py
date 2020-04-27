@@ -107,6 +107,8 @@ class Document(OrderedClass):
             return self.keyphrases[:num]
     
     def get_keyphrases_by_fraction(self, frac):
+        if not 0 <= frac <= 1:
+            raise ValueError("The value for frac must be a number between 0 and 1, inclusive.")
         if self.keyphrases is None:
             return None
         else:
