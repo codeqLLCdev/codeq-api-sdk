@@ -99,13 +99,13 @@ class Document(OrderedClass):
                 else:
                     doc_dict[attr] = value
         return doc_dict
-    
+
     def get_keyphrases_by_num(self, num):
         if self.keyphrases is None:
             return None
         else:
             return self.keyphrases[:num]
-    
+
     def get_keyphrases_by_fraction(self, frac):
         if not 0 <= frac <= 1:
             raise ValueError("The value for frac must be a number between 0 and 1, inclusive.")
@@ -383,6 +383,7 @@ class CodeqClient(object):
         document.summary_detokens = document_json_dict['summary_detokens']
         document.compressed_summary = document_json_dict['compressed_summary']
         document.compressed_summary_detokens = document_json_dict['compressed_summary_detokens']
+        document.keyphrases = document_json_dict['keyphrases']
 
         sentences = []
         for sentence_dict in document_json_dict['sentences']:
