@@ -91,19 +91,6 @@ class Document(OrderedClass):
         document.sentences = sentences
         return document
 
-    def to_dict(self):
-        """
-        Converts a Document object into a dict from its not None attributes.
-        """
-        doc_dict = OrderedDict()
-        for attr, value in self.items():
-            if value is not None and value != {} and value != []:
-                if attr == 'sentences':
-                    doc_dict[attr] = [s.to_dict() for s in value]
-                else:
-                    doc_dict[attr] = value
-        return doc_dict
-
     def get_keyphrases_by_num(self, num):
         if self.keyphrases is None:
             return None
@@ -118,6 +105,19 @@ class Document(OrderedClass):
         else:
             num = int(frac * len(self.keyphrases))
             return self.keyphrases[:num]
+
+    def to_dict(self):
+        """
+        Converts a Document object into a dict from its not None attributes.
+        """
+        doc_dict = OrderedDict()
+        for attr, value in self.items():
+            if value is not None and value != {} and value != []:
+                if attr == 'sentences':
+                    doc_dict[attr] = [s.to_dict() for s in value]
+                else:
+                    doc_dict[attr] = value
+        return doc_dict
 
     def pretty_print(self):
         return json.dumps(self.to_dict(), indent=2)
