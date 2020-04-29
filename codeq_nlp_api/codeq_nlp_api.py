@@ -35,18 +35,20 @@ class Document(OrderedClass):
 
     Document attributes:
 
-    - raw_text: the input string used to create the Document
     - language: predicted language
     - language_probability: probability of predicted language
+    - raw_text: the input string used to create the Document
     - tokens: a list of words
+    - raw_detokens: a list of words in detokenized form
     - summary: a string containing the summary of the input text
     - summary_detokens: a string containing the summary of the input text in detokenized form
     - compressed_summary: a string containing the compressed summary of the input text
     - compressed_summary_detokens: a string containing the compressed summary of the input text in detokenized form
     - keyphrases: a list of extracted keyphrases for the document, in decreasing order of relevance
-    - sentences: a list of Sentences objects
+    - keyphrases_scored: a list of extracted keyphrases for the document, including their scores
+    - errors: a list of error messages collected while analyzing a Document
     - run_time_stats: a dict containing run time statistics about each annotator
-
+    - sentences: a list of Sentences objects
     """
 
     def __init__(self, raw_text, tokens=None, sentences=None):
@@ -61,13 +63,11 @@ class Document(OrderedClass):
         self.compressed_summary = None
         self.compressed_summary_detokens = {}
         self.keyphrases = None
-
+        self.keyphrases_scored = None
         # Errors
         self.errors = []
-
         # Stats
         self.run_time_stats = {}
-
         # Sentences
         self.sentences = sentences
 
@@ -90,21 +90,6 @@ class Document(OrderedClass):
         document = Document(raw_text='\n'.join(list_of_strings))
         document.sentences = sentences
         return document
-
-    def get_keyphrases_by_num(self, num):
-        if self.keyphrases is None:
-            return None
-        else:
-            return self.keyphrases[:num]
-
-    def get_keyphrases_by_fraction(self, frac):
-        if not 0 <= frac <= 1:
-            raise ValueError("The value for frac must be a number between 0 and 1, inclusive.")
-        if self.keyphrases is None:
-            return None
-        else:
-            num = int(frac * len(self.keyphrases))
-            return self.keyphrases[:num]
 
     def to_dict(self):
         """
