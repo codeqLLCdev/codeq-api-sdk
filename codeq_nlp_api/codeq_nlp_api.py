@@ -35,17 +35,20 @@ class Document(OrderedClass):
 
     Document attributes:
 
-    - raw_text: the input string used to create the Document
     - language: predicted language
     - language_probability: probability of predicted language
+    - raw_text: the input string used to create the Document
     - tokens: a list of words
+    - raw_detokens: a list of words in detokenized form
     - summary: a string containing the summary of the input text
     - summary_detokens: a string containing the summary of the input text in detokenized form
     - compressed_summary: a string containing the compressed summary of the input text
     - compressed_summary_detokens: a string containing the compressed summary of the input text in detokenized form
-    - sentences: a list of Sentences objects
+    - keyphrases: a list of extracted keyphrases for the document, in decreasing order of relevance
+    - keyphrases_scored: a list of extracted keyphrases for the document, including their scores
+    - errors: a list of error messages collected while analyzing a Document
     - run_time_stats: a dict containing run time statistics about each annotator
-
+    - sentences: a list of Sentences objects
     """
 
     def __init__(self, raw_text, tokens=None, sentences=None):
@@ -54,16 +57,19 @@ class Document(OrderedClass):
         self.language_probability = None
         self.raw_text = raw_text
         self.tokens = tokens
-        self.sentences = sentences
         self.raw_detokens = None
         self.summary = None
         self.summary_detokens = {}
         self.compressed_summary = None
         self.compressed_summary_detokens = {}
+        self.keyphrases = None
+        self.keyphrases_scored = None
         # Errors
         self.errors = []
         # Stats
         self.run_time_stats = {}
+        # Sentences
+        self.sentences = sentences
 
     @classmethod
     def from_list_of_strings(cls, list_of_strings):
@@ -320,23 +326,26 @@ class CodeqClient(object):
     def salience(self, text):
         return self.__run_request(text, pipeline='salience')
 
-    def analyze(self, text, pipeline=None, benchmark=False):
+    @staticmethod
+    def _json_to_class(cls, data):
         """
-        :param text: A string
-        :param pipeline: A list of strings or a comma-separated string
-            indicating the specific annotators to apply to the input text.
-            Example: ['speechact', 'tasks'] or 'speechact, tasks'.
-            Analyzer Annotator options:
-                language, tokenize, detokenize, ssplit, stopword, stem, truecase, detruecase,
-                pos, lemma, speechact, question, ner, parse, coreference, date, task,
-                sentiment, emotion, sarcasm, compress, summarize, summarize_compress,
-                chunk, nel, semantic_roles
-        :param benchmark: Boolean to indicate the storage of benchmark run times for each Annotator
+        Deserialize a json string into an instance of a given class
+        :param cls: Class name
+        :param data: Json string
         :return:
         """
-        if isinstance(pipeline, str):
-            pipeline = re.split(r'\s*,\s*', pipeline)
-        return self.__run_request(text, pipeline=pipeline, benchmark=benchmark)
+        instance = object.__new__(cls)
+        for key, value in list(data.items()):
+            setattr(instance, key, value)
+        return instance
+
+    def __document_from_json(self, document_json, benchmark):
+        document = self._json_to_class(cls=Document, data=document_json)
+        document.sentences = [self._json_to_class(cls=Sentence, data=sent_dict) for sent_dict in document.sentences]
+        if not benchmark:
+            document.run_time_stats = None
+
+        return document
 
     def __run_request(self, text, pipeline, benchmark=False):
         params = {
@@ -349,41 +358,23 @@ class CodeqClient(object):
         request = requests.post(url=self.endpoint, json=params)
 
         if request.status_code == 200:
-            # Make OrderedDict from request.text output
+            # Deserialize JSON response
             document_json = json.loads(request.text, object_pairs_hook=OrderedDict)
-            return self.__document_from_dict(document_json, benchmark)
+            document = self.__document_from_json(document_json, benchmark)
+            return document
         else:
             raise CodeqAPIError("%s; %s" % (request.status_code, request.reason))
 
-    @staticmethod
-    def __document_from_dict(document_json_dict, benchmark):
-        document = Document(raw_text=document_json_dict['raw_text'])
-        document.tokens = document_json_dict['tokens']
-        document.language = document_json_dict['language']
-        document.language_probability = document_json_dict['language_probability']
-        document.raw_detokens = document_json_dict['raw_detokens']
-        document.summary = document_json_dict['summary']
-        document.summary_detokens = document_json_dict['summary_detokens']
-        document.compressed_summary = document_json_dict['compressed_summary']
-        document.compressed_summary_detokens = document_json_dict['compressed_summary_detokens']
-
-        sentences = []
-        for sentence_dict in document_json_dict['sentences']:
-            sentence = Sentence(raw_sentence=sentence_dict['raw_sentence'])
-            for key, value in sentence_dict.items():
-                if key == 'raw_sentence':
-                    # We already set this
-                    continue
-                sentence.__setattr__(key, value)
-            sentences.append(sentence)
-        document.sentences = sentences
-
-        if benchmark:
-            document.run_time_stats = document_json_dict['run_time_stats']
-        else:
-            document.run_time_stats = None
-
-        if 'errors' in document_json_dict and document_json_dict['errors']:
-            document.errors = document_json_dict['errors']
-
+    def analyze(self, text, pipeline=None, benchmark=False):
+        """
+        :param text: A string
+        :param pipeline: A list of strings or a comma-separated string indicating the specific annotators
+            to apply to the input text. Example: ['speechact', 'tasks'] or 'speechact, tasks'.
+            Analyzer Annotator options, see: https://api.codeq.com/api
+        :param benchmark: Boolean to indicate the storage of benchmark run times for each Annotator
+        :return: Instance of a Document object with analyzed Sentences
+        """
+        if isinstance(pipeline, str):
+            pipeline = re.split(r'\s*,\s*', pipeline)
+        document = self.__run_request(text, pipeline=pipeline, benchmark=benchmark)
         return document
