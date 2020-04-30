@@ -99,21 +99,6 @@ class Document(OrderedClass):
                 else:
                     doc_dict[attr] = value
         return doc_dict
-    
-    def get_keyphrases_by_num(self, num):
-        if self.keyphrases is None:
-            return None
-        else:
-            return self.keyphrases[:num]
-    
-    def get_keyphrases_by_fraction(self, frac):
-        if not 0 <= frac <= 1:
-            raise ValueError("The value for frac must be a number between 0 and 1, inclusive.")
-        if self.keyphrases is None:
-            return None
-        else:
-            num = int(frac * len(self.keyphrases))
-            return self.keyphrases[:num]
 
     def pretty_print(self):
         return json.dumps(self.to_dict(), indent=2)
