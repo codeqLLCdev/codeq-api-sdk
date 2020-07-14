@@ -4,6 +4,7 @@ import re
 import requests
 
 CODEQ_API_ENDPOINT_LAST = 'https://api.codeq.com/v1'
+CODEQ_API_TEXT_SIMILARITY_ENDPOINT_LAST = 'https://api.codeq.com/v1_text_similarity'
 
 
 class OrderedClass(object):
@@ -244,6 +245,7 @@ class CodeqClient(object):
         self.user_id = user_id
         self.user_key = user_key
         self.endpoint = CODEQ_API_ENDPOINT_LAST
+        self.endpoint_text_similarity = CODEQ_API_TEXT_SIMILARITY_ENDPOINT_LAST
 
     def language(self, text):
         return self.__run_request(text, pipeline='language')
@@ -365,6 +367,21 @@ class CodeqClient(object):
         else:
             raise CodeqAPIError("%s; %s" % (request.status_code, request.reason))
 
+    def __run_request_text_similarity(self, text1, text2, pipeline):
+        params = {
+            'user_id': self.user_id,
+            'user_key': self.user_key,
+            'text1': text1,
+            'text2': text2,
+            'pipeline': pipeline
+        }
+        request = requests.post(url=self.endpoint_text_similarity, json=params)
+
+        if request.status_code == 200:
+            return request.text
+        else:
+            raise CodeqAPIError("%s; %s" % (request.status_code, request.reason))
+
     def analyze(self, text, pipeline=None, benchmark=False):
         """
         :param text: A string
@@ -378,3 +395,13 @@ class CodeqClient(object):
             pipeline = re.split(r'\s*,\s*', pipeline)
         document = self.__run_request(text, pipeline=pipeline, benchmark=benchmark)
         return document
+
+    def analyze_text_similarity(self, text1, text2):
+        """
+        :param text1: A string
+        :param text2: A string
+        :return: A dict containing a text similarity score
+        """
+        pipeline = 'text_similarity'
+        score = self.__run_request_text_similarity(text1, text2, pipeline=pipeline)
+        return score
