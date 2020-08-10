@@ -124,6 +124,7 @@ class Sentence(OrderedClass):
     - paragraph: a number indicating the index paragrah of the sentence in the Document
     - tokens: a list of words
     - tokens_filtered: a list of words without stop words
+    - tokens_clean: a list of words without the artifacts that the prepocessing modules remove
     - stems: a list of stemmed words
     - lemmas: a list of lemmatized words
     - pos_tags: a list of Part of Speech tags, corresponding to each word in the list of tokens
@@ -156,6 +157,7 @@ class Sentence(OrderedClass):
         Additionally, each coreference dict contains a coreference chain (all the ids of the linked mentions)
         and the first referent of a chain.
     - compressed_sentence: a string with a a shortened version of a sentence.
+    - abuse: a list of types of abuse conveyed in a sentence
     """
 
     def __init__(self, raw_sentence):
@@ -164,6 +166,7 @@ class Sentence(OrderedClass):
         self.paragraph = None
         self.tokens = None
         self.tokens_filtered = None
+        self.tokens_clean = None
 
         self.stems = None
         self.lemmas = None
@@ -192,10 +195,9 @@ class Sentence(OrderedClass):
         self.nes_types = None
         self.nes_positions = None
 
+        self.sentiments = None
         self.emotions = None
         self.sarcasm = None
-
-        self.sentiments = None
 
         self.dates = None
 
@@ -206,6 +208,8 @@ class Sentence(OrderedClass):
         self.coreferences = None
 
         self.compressed_sentence = None
+
+        self.abuse = None
 
     @property
     def tagged_sentence(self):
@@ -327,6 +331,9 @@ class CodeqClient(object):
 
     def salience(self, text):
         return self.__run_request(text, pipeline='salience')
+
+    def abuse(self, text):
+        return self.__run_request(text, pipeline='abuse')
 
     @staticmethod
     def _json_to_class(cls, data):
