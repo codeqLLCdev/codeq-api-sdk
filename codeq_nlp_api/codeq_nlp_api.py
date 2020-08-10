@@ -124,6 +124,7 @@ class Sentence(OrderedClass):
     - paragraph: a number indicating the index paragrah of the sentence in the Document
     - tokens: a list of words
     - tokens_filtered: a list of words without stop words
+    - tokens_clean: a list of words without the artifacts that the prepocessing modules remove
     - stems: a list of stemmed words
     - lemmas: a list of lemmatized words
     - pos_tags: a list of Part of Speech tags, corresponding to each word in the list of tokens
@@ -165,6 +166,7 @@ class Sentence(OrderedClass):
         self.paragraph = None
         self.tokens = None
         self.tokens_filtered = None
+        self.tokens_clean = None
 
         self.stems = None
         self.lemmas = None
