@@ -39,7 +39,7 @@ class Document(OrderedClass):
     - language: predicted language
     - language_probability: probability of predicted language
     - raw_text: the input string used to create the Document
-    - clean_raw_text: the clean version of the input string produced by the language preprocessor
+    - raw_text_clean: the clean version of the input string produced by the language preprocessor
     - tokens: a list of words
     - raw_detokens: a list of words in detokenized form
     - summary: a string containing the summary of the input text
@@ -58,7 +58,7 @@ class Document(OrderedClass):
         self.language = None
         self.language_probability = None
         self.raw_text = raw_text
-        self.clean_raw_text = None
+        self.raw_text_clean = None
         self.tokens = tokens
         self.raw_detokens = None
         self.summary = None
