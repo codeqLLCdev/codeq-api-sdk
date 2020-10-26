@@ -253,89 +253,89 @@ class CodeqClient(object):
         self.endpoint = CODEQ_API_ENDPOINT_LAST
         self.endpoint_text_similarity = CODEQ_API_TEXT_SIMILARITY_ENDPOINT_LAST
 
-    def language(self, text):
-        return self.__run_request(text, pipeline='language')
+    def language(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='language')
 
-    def tokenize(self, text):
-        return self.__run_request(text, pipeline='tokenize')
+    def tokenize(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='tokenize')
 
-    def detokenize(self, text):
-        return self.__run_request(text, pipeline='detokenize')
+    def detokenize(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='detokenize')
 
-    def ssplit(self, text):
-        return self.__run_request(text, pipeline='ssplit')
+    def ssplit(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='ssplit')
 
-    def stopword(self, text):
-        return self.__run_request(text, pipeline='stopword')
+    def stopword(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='stopword')
 
-    def stem(self, text):
-        return self.__run_request(text, pipeline='stem')
+    def stem(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='stem')
 
-    def truecase(self, text):
-        return self.__run_request(text, pipeline='truecase')
+    def truecase(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='truecase')
 
-    def detruecase(self, text):
-        return self.__run_request(text, pipeline='detruecase')
+    def detruecase(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='detruecase')
 
-    def pos(self, text):
-        return self.__run_request(text, pipeline='pos')
+    def pos(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='pos')
 
-    def lemma(self, text):
-        return self.__run_request(text, pipeline='lemma')
+    def lemma(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='lemma')
 
-    def speechact(self, text):
-        return self.__run_request(text, pipeline='speechact')
+    def speechact(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='speechact')
 
-    def question(self, text):
-        return self.__run_request(text, pipeline='question')
+    def question(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='question')
 
-    def ner(self, text):
-        return self.__run_request(text, pipeline='ner')
+    def ner(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='ner')
 
-    def parse(self, text):
-        return self.__run_request(text, pipeline='parse')
+    def parse(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='parse')
 
-    def semantic_roles(self, text):
-        return self.__run_request(text, pipeline='semantic_roles')
+    def semantic_roles(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='semantic_roles')
 
-    def coreferences(self, text):
-        return self.__run_request(text, pipeline='coreference')
+    def coreferences(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='coreference')
 
-    def date(self, text):
-        return self.__run_request(text, pipeline='date')
+    def date(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='date')
 
-    def task(self, text):
-        return self.__run_request(text, pipeline='task')
+    def task(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='task')
 
-    def sentiment(self, text):
-        return self.__run_request(text, pipeline='sentiment')
+    def sentiment(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='sentiment')
 
-    def emotion(self, text):
-        return self.__run_request(text, pipeline='emotion')
+    def emotion(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='emotion')
 
-    def sarcasm(self, text):
-        return self.__run_request(text, pipeline='sarcasm')
+    def sarcasm(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='sarcasm')
 
-    def compress(self, text):
-        return self.__run_request(text, pipeline='compress')
+    def compress(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='compress')
 
-    def summarize(self, text):
-        return self.__run_request(text, pipeline='summarize')
+    def summarize(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='summarize')
 
-    def summarize_compress(self, text):
-        return self.__run_request(text, pipeline='summarize_compress')
+    def summarize_compress(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='summarize_compress')
 
-    def chunk(self, text):
-        return self.__run_request(text, pipeline='chunk')
+    def chunk(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='chunk')
 
-    def nel(self, text):
-        return self.__run_request(text, pipeline='nel')
+    def nel(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='nel')
 
-    def salience(self, text):
-        return self.__run_request(text, pipeline='salience')
+    def salience(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='salience')
 
-    def abuse(self, text):
-        return self.__run_request(text, pipeline='abuse')
+    def abuse(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='abuse')
 
     @staticmethod
     def _json_to_class(cls, data):
@@ -358,14 +358,19 @@ class CodeqClient(object):
 
         return document
 
-    def __run_request(self, text, pipeline, benchmark=False):
+    def __run_request(self, text, sentences, pipeline, benchmark=False):
+        if isinstance(pipeline, str):
+            pipeline = re.split(r'\s*,\s*', pipeline)
         params = {
             'user_id': self.user_id,
             'user_key': self.user_key,
-            'text': text,
             'pipeline': pipeline,
             'benchmark': benchmark
         }
+        if text:
+            params['text'] = text
+        if sentences:
+            params['sentences'] = sentences
         request = requests.post(url=self.endpoint, json=params)
 
         if request.status_code == 200:
@@ -400,9 +405,20 @@ class CodeqClient(object):
         :param benchmark: Boolean to indicate the storage of benchmark run times for each Annotator
         :return: Instance of a Document object with analyzed Sentences
         """
-        if isinstance(pipeline, str):
-            pipeline = re.split(r'\s*,\s*', pipeline)
-        document = self.__run_request(text, pipeline=pipeline, benchmark=benchmark)
+        document = self.__run_request(text=text, sentences=None, pipeline=pipeline, benchmark=benchmark)
+        return document
+
+    def analyze_sentences(self, sentences=None, pipeline=None, benchmark=False):
+        """
+        :param sentences: A list of strings to be used as the sentences of the Document.
+            No further sentence segmentation will be applied.
+        :param pipeline: A list of strings or a comma-separated string indicating the specific annotators
+            to apply to the input text. Example: ['speechact', 'tasks'] or 'speechact, tasks'.
+            Analyzer Annotator options, see: https://api.codeq.com/api
+        :param benchmark: Boolean to indicate the storage of benchmark run times for each Annotator
+        :return: Instance of a Document object with analyzed Sentences
+        """
+        document = self.__run_request(text=None, sentences=sentences, pipeline=pipeline, benchmark=benchmark)
         return document
 
     def analyze_text_similarity(self, text1, text2):
