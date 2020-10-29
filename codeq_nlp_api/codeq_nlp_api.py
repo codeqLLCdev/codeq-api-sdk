@@ -108,7 +108,25 @@ class Document(OrderedClass):
         return doc_dict
 
     def pretty_print(self):
-        return json.dumps(self.to_dict(), indent=2)
+        doc_dict = OrderedDict()
+        for attr, value in self.items():
+            if attr == 'sentences':
+                continue
+            if value is not None:
+                doc_dict[attr] = value if type(value) == str else str(value)
+        doc = json.dumps(doc_dict, indent=2)
+        doc = doc.strip('}')
+        doc += '  "sentences":\n'
+        for i, s in enumerate(self.sentences):
+            s = s.pretty_print()
+            s = '\n    '.join(s.split('\n'))
+            s = s.replace('    }', '  }')
+            if i < len(self.sentences) - 1:
+                s += ','
+            doc += '  ' + s
+        doc = doc.replace('},  {', '},\n  {')
+        doc += '\n}'
+        return doc
 
     def __str__(self):
         return 'Document: %s' % self.to_dict().__str__()
