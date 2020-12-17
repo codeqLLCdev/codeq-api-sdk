@@ -48,6 +48,7 @@ class Document(OrderedClass):
     - compressed_summary_detokens: a string containing the compressed summary of the input text in detokenized form
     - keyphrases: a list of extracted keyphrases for the document, in decreasing order of relevance
     - keyphrases_scored: a list of extracted keyphrases for the document, including their scores
+    - news_article: dict containing the output of the news_extractor module
     - errors: a list of error messages collected while analyzing a Document
     - run_time_stats: a dict containing run time statistics about each annotator
     - sentences: a list of Sentences objects
@@ -67,6 +68,7 @@ class Document(OrderedClass):
         self.compressed_summary_detokens = {}
         self.keyphrases = None
         self.keyphrases_scored = None
+        self.news_article = None
         # Errors
         self.errors = []
         # Stats
