@@ -306,6 +306,9 @@ class CodeqClient(object):
     def speechact(self, text, sentences):
         return self.__run_request(text, sentences, pipeline='speechact')
 
+    def speechact2(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='speechact2')
+
     def question(self, text, sentences):
         return self.__run_request(text, sentences, pipeline='question')
 
