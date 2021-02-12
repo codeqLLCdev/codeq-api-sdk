@@ -206,8 +206,10 @@ class Sentence(OrderedClass):
         self.truecase_sentence = None
         self.detruecase_sentence = None
 
+        self.speech_acts_legacy = None
+        self.speech_act_values_legacy = None
+
         self.speech_acts = None
-        self.speech_act_values = None
         self.question_types = None
         self.question_tags = None
 
@@ -304,11 +306,11 @@ class CodeqClient(object):
     def lemma(self, text, sentences):
         return self.__run_request(text, sentences, pipeline='lemma')
 
+    def speechact_legacy(self, text, sentences):
+        return self.__run_request(text, sentences, pipeline='speechact_legacy')
+
     def speechact(self, text, sentences):
         return self.__run_request(text, sentences, pipeline='speechact')
-
-    def speechact2(self, text, sentences):
-        return self.__run_request(text, sentences, pipeline='speechact2')
 
     def question(self, text, sentences):
         return self.__run_request(text, sentences, pipeline='question')
