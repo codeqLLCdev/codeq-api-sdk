@@ -65,6 +65,8 @@ class Document(OrderedClass):
         self.summary = None
         self.summary_short = None
         self.summary_short_bullet = None
+        self.summary_medium = None
+        self.summary_medium_bullet = None
         self.summary_detokens = {}
         self.compressed_summary = None
         self.compressed_summary_detokens = {}
