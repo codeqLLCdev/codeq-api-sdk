@@ -387,14 +387,15 @@ class CodeqClient(object):
 
         return document
 
-    def __run_request(self, text, sentences, pipeline, benchmark=False):
+    def __run_request(self, text, sentences, pipeline, benchmark=False, **user_params):
         if isinstance(pipeline, str):
             pipeline = re.split(r'\s*,\s*', pipeline)
         params = {
             'user_id': self.user_id,
             'user_key': self.user_key,
             'pipeline': pipeline,
-            'benchmark': benchmark
+            'benchmark': benchmark,
+            'summary_length': user_params['summary_length'] if 'summary_length' in user_params else None
         }
         if text:
             params['text'] = text
@@ -425,7 +426,7 @@ class CodeqClient(object):
         else:
             raise CodeqAPIError("%s; %s" % (request.status_code, request.reason))
 
-    def analyze(self, text, pipeline=None, benchmark=False):
+    def analyze(self, text, pipeline=None, benchmark=False, **user_params):
         """
         :param text: A string
         :param pipeline: A list of strings or a comma-separated string indicating the specific annotators
@@ -434,7 +435,7 @@ class CodeqClient(object):
         :param benchmark: Boolean to indicate the storage of benchmark run times for each Annotator
         :return: Instance of a Document object with analyzed Sentences
         """
-        document = self.__run_request(text=text, sentences=None, pipeline=pipeline, benchmark=benchmark)
+        document = self.__run_request(text=text, sentences=None, pipeline=pipeline, benchmark=benchmark, **user_params)
         return document
 
     def analyze_sentences(self, sentences=None, pipeline=None, benchmark=False):
