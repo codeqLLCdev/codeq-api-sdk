@@ -395,7 +395,7 @@ class CodeqClient(object):
             'user_key': self.user_key,
             'pipeline': pipeline,
             'benchmark': benchmark,
-            'summary_length': user_params['summary_length'] if 'summary_length' in user_params else None
+            'user_params': user_params
         }
         if text:
             params['text'] = text
