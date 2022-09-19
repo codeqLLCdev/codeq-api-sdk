@@ -239,6 +239,14 @@ class Sentence(OrderedClass):
 
         self.abuse = None
 
+        self.scores = {'speechact': 0.0, \
+                    'question': 0.0, \
+                    'task': 0.0, \
+                    'sentiment': 0.0, \
+                    'emotion': 0.0, \
+                    'sarcasm': 0.0, \
+                    'abuse': 0.0}
+
     @property
     def tagged_sentence(self):
         if not self.pos_tags:
