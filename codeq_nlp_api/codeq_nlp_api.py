@@ -184,6 +184,7 @@ class Sentence(OrderedClass):
         and the first referent of a chain.
     - compressed_sentence: a string with a a shortened version of a sentence.
     - abuse: a list of types of abuse conveyed in a sentence
+    - scores: contains information about the confidence (probability) assigned to certain classes
     """
 
     def __init__(self, raw_sentence):
@@ -242,10 +243,10 @@ class Sentence(OrderedClass):
         self.scores = {'speechact': 0.0, \
                     'question': 0.0, \
                     'task': 0.0, \
-                    'sentiment': 0.0, \
-                    'emotion': 0.0, \
+                    'sentiment': {}, \
+                    'emotion': {}, \
                     'sarcasm': 0.0, \
-                    'abuse': 0.0}
+                    'abuse': {}}
 
     @property
     def tagged_sentence(self):
