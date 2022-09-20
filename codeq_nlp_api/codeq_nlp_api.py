@@ -241,12 +241,13 @@ class Sentence(OrderedClass):
         self.abuse = None
 
         self.scores = {
-            'speechact': 0.0,
-            'question': 0.0,
-            'task': 0.0,
+            'speechact': {},
+            'question': {},
+            'task': {},
+            'task_subclassification': {},
             'sentiment': {},
             'emotion': {},
-            'sarcasm': 0.0,
+            'sarcasm': {},
             'abuse': {}
         }
 
