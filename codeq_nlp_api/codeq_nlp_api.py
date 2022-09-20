@@ -240,13 +240,15 @@ class Sentence(OrderedClass):
 
         self.abuse = None
 
-        self.scores = {'speechact': 0.0, \
-                    'question': 0.0, \
-                    'task': 0.0, \
-                    'sentiment': {}, \
-                    'emotion': {}, \
-                    'sarcasm': 0.0, \
-                    'abuse': {}}
+        self.scores = {
+            'speechact': 0.0,
+            'question': 0.0,
+            'task': 0.0,
+            'sentiment': {},
+            'emotion': {},
+            'sarcasm': 0.0,
+            'abuse': {}
+        }
 
     @property
     def tagged_sentence(self):
@@ -414,7 +416,7 @@ class CodeqClient(object):
 
         if request.status_code == 200:
             # Deserialize JSON response
-            document_json = json.loads(request.text, object_pairs_hook=OrderedDict)
+            document_json = json.loads(request.text, object_pairs_hook=dict)
             document = self.__document_from_json(document_json, benchmark)
             return document
         else:
