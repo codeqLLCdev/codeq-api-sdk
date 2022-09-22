@@ -244,7 +244,7 @@ class Sentence(OrderedClass):
             'speechact': {},
             'question': {},
             'task': {},
-            'task_subclassification': {},
+            'task_actions': {},
             'sentiment': {},
             'emotion': {},
             'sarcasm': {},

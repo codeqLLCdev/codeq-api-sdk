@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-__version__ = "2.8.0"
+__version__ = "2.8.1"
 
 download_url = "https://github.com/codeqLLCdev/codeq-api-sdk/archive/v%s.tar.gz" % __version__
 
