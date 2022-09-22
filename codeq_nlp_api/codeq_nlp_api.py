@@ -184,6 +184,7 @@ class Sentence(OrderedClass):
         and the first referent of a chain.
     - compressed_sentence: a string with a a shortened version of a sentence.
     - abuse: a list of types of abuse conveyed in a sentence
+    - scores: contains information about the confidence (probability) assigned to certain classes
     """
 
     def __init__(self, raw_sentence):
@@ -238,6 +239,17 @@ class Sentence(OrderedClass):
         self.compressed_sentence = None
 
         self.abuse = None
+
+        self.scores = {
+            'speechact': {},
+            'question': {},
+            'task': {},
+            'task_subclassification': {},
+            'sentiment': {},
+            'emotion': {},
+            'sarcasm': {},
+            'abuse': {}
+        }
 
     @property
     def tagged_sentence(self):
@@ -405,7 +417,7 @@ class CodeqClient(object):
 
         if request.status_code == 200:
             # Deserialize JSON response
-            document_json = json.loads(request.text, object_pairs_hook=OrderedDict)
+            document_json = json.loads(request.text, object_pairs_hook=dict)
             document = self.__document_from_json(document_json, benchmark)
             return document
         else:
